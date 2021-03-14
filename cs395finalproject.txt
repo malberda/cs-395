@@ -1,0 +1,511 @@
+
+<!DOCTYPE HTML>
+ 
+<html>
+
+    <head>
+		<!-- Chrome browser will display response in the form of an HTML page by using the line below. -->
+        <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+		<!-- Importing Dr. BC's established functions. -->
+        <link rel="stylesheet" href="general.css">
+        <script type="text/javascript" src="general.js"></script>
+        <script type="text/javascript" src="tableFunctions.js"></script>
+        <script type="text/javascript" src="headerFunction.js"></script>
+        <script type="text/javascript" src="pseudocodeFunctions.js"></script>
+        
+        <!-- All of the non-imported functions created by us for running the algorithm and displaying it. -->
+        <script type="text/javascript"> 
+            var arr_k = [];
+            var arr_p = [];
+            var global_i;
+            var global_j;
+            var global_q;
+         
+            // This starts the pseudocode portion of the code, which will display whether the user
+            // selected the correct answer for greater frequency value or not.
+            function startPseudocode()
+            {
+                // Button formatting to make sure they are on the same line.
+                document.getElementById("ButtonShowMe").disabled=false;
+                document.getElementById("ButtonShowMe").style.visibilty="visible";
+                document.getElementById("ButtonShowMe").style.display="inline-block";
+                document.getElementById("ButtonShowMe").innerHTML="Show Me";
+                document.getElementById("ButtonYes").style.display="inline-block";
+                document.getElementById("ButtonNo").style.display="inline-block";
+                
+                var init_size = document.getElementById("numelements").value;
+                var size = parseInt(init_size);
+                
+                // This table holds the strings for the correct/incorrect messages.
+                createPseudocodeTable("ptable");
+                global_q = 0;
+                global_i = 1;
+                global_j = 1;
+                
+                // Written messages and button population. Also highlights the current cells yellow.
+                document.getElementById("ButtonYes").innerHTML=getCellValue("optimaltable", global_i, global_j);
+                document.getElementById("ButtonNo").innerHTML=getCellValue("optimaltable", global_i+1, global_j+1);
+                setCellColor("optimaltable", global_i, global_j, "yellow");
+                setCellColor("optimaltable", global_i+1, global_j+1, "yellow");
+                setCellColor("rootstable", global_i, global_j, "yellow");
+                setCellColor("rootstable", global_i+1, global_j+1, "yellow");
+				
+				// Pseudocode section begins here.
+                appendPseudocodeQuestion("ptable", "Which frequency value is greater, and would then have its key be the root of its own optimal binary search subtree?");
+                showElement("ButtonShowMe", "Show Me");
+            }
+         
+            // If the user selects "Show Me" the current step will be auto-performed.
+            function showMe()
+            {
+                nextStep();
+            }
+         
+            // Handles the conditions on the left-hand button (if it's greater or not).
+            function leftOption()
+            {
+				// Correct message if the left is the larger value of the two.
+                if(getCellValue("optimaltable", global_i, global_j) >= getCellValue("optimaltable", global_i+1, global_j+1))
+                {
+                    temp = getCellValue("optimaltable", global_i, global_j) + " is correct!"
+                    appendPseudocode("ptable", temp)
+                    nextStep();
+                }
+                
+				// Incorrect message if it's not.
+                else
+                {
+                    temp = getCellValue("optimaltable", global_i, global_j) + " is incorrect!"
+                    appendPseudocode("ptable", temp)
+                }
+            }
+         
+            // Handles the conditions on the right-hand button (if it's greater or not).
+            function rightOption()
+            {
+				// Correct message if the left is the larger value of the two.
+                if(getCellValue("optimaltable", global_i, global_j) <= getCellValue("optimaltable", global_i+1, global_j+1))
+                {
+                    temp = getCellValue("optimaltable", global_i+1, global_j+1) + " is correct!"
+                    appendPseudocode("ptable", temp)
+                    nextStep();
+                }
+                
+				// Incorrect message if it's not.
+                else
+                {
+                    temp = getCellValue("optimaltable", global_i+1, global_j+1) + " is incorrect!"
+                    appendPseudocode("ptable", temp)
+                }
+            }
+         
+            // Increments the current cells that are highlighted and progresses to the next comparison of those cells' values.
+            function nextStep()
+            {
+                var init_size = document.getElementById("numelements").value;
+                var size = parseInt(init_size);
+                
+                // Removes the black color in the cell so that the contents are visible.
+                setCellColor("optimaltable", global_i+1, global_j, "white");
+                setCellColor("rootstable", global_i+1, global_j, "white");
+                setCellColor("optimaltable", global_i, global_j, "white");
+                setCellColor("optimaltable", global_i+1, global_j+1, "white");
+                setCellColor("rootstable", global_i, global_j, "white");
+                setCellColor("rootstable", global_i+1, global_j+1, "white");
+                
+                // Once the table has been fully compared, the buttons for comparison disappear for aesthetic purposes.
+                if(global_j == 1 && global_i == size-1)
+                {
+                    document.getElementById("ButtonShowMe").style.visibility="hidden";
+                    document.getElementById("ButtonYes").style.visibility="hidden";
+                    document.getElementById("ButtonNo").style.visibility="hidden";
+                    setCellColor("rootstable", size, 1, "yellow");
+                }
+                
+                if(global_j == size-1-global_q)
+                {
+                    global_i = global_i-global_j+2;
+                    global_j = 1;
+                    global_q++;
+                }
+				
+                else
+                {
+                    global_i++;
+                    global_j++;
+                }
+                
+                // Current cells being compared highlighted here.
+                setCellColor("optimaltable", global_i, global_j, "yellow");
+                setCellColor("optimaltable", global_i+1, global_j+1, "yellow");
+                setCellColor("rootstable", global_i, global_j, "yellow");
+                setCellColor("rootstable", global_i+1, global_j+1, "yellow");
+                document.getElementById("ButtonYes").innerHTML=getCellValue("optimaltable", global_i,global_j);
+                document.getElementById("ButtonNo").innerHTML=getCellValue("optimaltable", global_i+1,global_j+1);
+            }
+         
+            // This will display the final resultant table if the user chooses to skip the step-by-step implementation.
+            function showTables()
+            {
+                var init_size = document.getElementById("numelements").value;
+                var size = parseInt(init_size);
+                var i, j;
+                
+                for(i = 0; i <= size; i++)
+                {
+                    for(j = 1; j <= size; j++)
+                    {
+                        setCellColor("optimaltable", i,j,"white");
+                    }
+                }
+                
+                for(i = 0; i < size+1; i++)
+                {
+                    for(j = 1; j < size+1; j++)
+                    {
+                        setCellColor("rootstable", i,j,"white");
+                    }
+                }
+                
+				setCellColor("rootstable", size, 1, "yellow");
+				setCellColor("optimaltable", size, 1, "yellow");
+                showbutton.style.display="none";
+            }
+         
+            // The algorithm implementation for an optimal binary search tree.
+            function OptimalBST()
+            {
+                var init_size = document.getElementById("numelements").value;
+                var size = parseInt(init_size);
+                var i, j, d, k;
+         
+                var C = [];
+                var arr = [];
+                var R = [];
+                var kmin, minval, sum;
+                
+                // 2-D arrays are kind of annoying to work with in JavaScript!
+                for (i = 0; i <= size+1; i++)
+                {
+                    C[i]=[]
+                    R[i] = [];
+                }
+         
+                for(i = 1; i <= size; i++)
+                {
+                    C[i][i] = parseFloat(arr_p[i-1]);
+                    arr[i-1]=parseFloat(arr_p[i-1]);
+                    R[i][i] = arr_k[i-1];
+                }
+         
+                for (i = 0; i <= size+1; i++)
+                {
+                    for (j = 0; j <= size+1; j++)
+                    {
+                        if(i != j)
+                        {
+                            C[i][j] = 0;
+                            R[i][j]=0;
+                        }
+                    }
+                }
+                
+                for(d = 1; d <= size-1; d++)
+                {   
+                    for(i = 1; i <= size-d ; i++)
+                    {  
+                        j = i + d;
+                        minval = Number.MAX_SAFE_INTEGER;
+                        
+                        for(k = i; k <= j; k++) 
+                        {
+                            if(C[k-1][i] + C[j][k+1] < minval)
+                            {
+                                minval = C[k-1][i] + C[j][k+1];
+                                kmin = k;
+                            }
+                        }
+                        
+                        R[j][i] =  arr_k[kmin-1];
+                        sum = C[i][i];
+                        
+                        for(s = i+1; s <= j; s++)
+                        {
+                            sum += C[s][s];
+                        }
+                        
+                        C[j][i] = minval+sum;
+                    }  
+                }
+ 
+                // Descriptions for both of the tables go here.  Some explanation for the user is provided.
+                var freqTableString = "The table below compares FREQUENCIES to find the smallest search cost sum for each subtree being sorted into an optimal BST. The top right value will be the minimum cost tree's root frequency.";
+                var keyTableString = "The table below compares corresponding KEY VALUES for roots of each subtree being sorted into an optimal BST. The top right value will be the minimum cost tree's root node key.";
+                var q1 = freqTableString.length;
+                var q2 = keyTableString.length;
+                
+                createTableWithWidth("print1", 1, 1, q1);
+                setCellColor("print1", 0, 0, "white");
+                setCell("print1", 0, 0, "The table below compares FREQUENCIES to find the smallest search cost sum for each subtree being sorted into an optimal BST. The top right value will be the minimum cost tree's root frequency.");
+				setCellBorder("print1", 0, 0, "thin solid white");
+                createTable("optimaltable", size+1, size+1);
+                createTableWithWidth("print2", 1, 1, q2);
+                setCellColor("print2", 0, 0, "white");
+                setCell("print2", 0, 0, "The table below compares corresponding KEY VALUES for roots of each subtree being sorted into an optimal BST. The top right value will be the minimum cost tree's root node key.");
+                setCellBorder("print2", 0, 0, "thin solid white");
+                createTable("rootstable", size+1, size+1);
+ 
+                for (i = 0; i <= size+1; i++)
+                {
+                    for (j = 0; j <= size+1; j++)
+                    {
+                        C[i][j] = C[i][j]*100;
+                        C[i][j] = Math.round(C[i][j]);
+                        C[i][j] = C[i][j]/100;
+                    }
+                }
+         
+                for(i = 0; i <= size; i++)
+                {
+                    for(j = 1; j <= size; j++)
+                    {
+                        setCell("optimaltable", i, j, C[i][j]);
+                        setCellBorder("optimaltable", i, j, "thin solid black");
+                        setCellColor("optimaltable", i, j, "black");
+                    }
+                }
+            
+                for(i = 0; i < size+1; i++)
+                {
+                    for(j = 1; j < size+1; j++)
+                    {
+                        setCell("rootstable", i, j, R[i][j]);
+                        setCellBorder("rootstable", i, j, "thin solid black");
+                        setCellColor("rootstable", i, j, "black");
+                    }
+                }
+                
+				// Reveals cells in the frequency table.
+                for(i = 0; i <= size; i++)
+                { 
+                    for(j = i; j <= size; j++)
+                    {
+                        setCellColor("optimaltable", i, j, "white");
+                    }
+                }
+				
+                // Reveals cells in the values table.
+                for(i = 0; i < size+1; i++)
+                {
+                    for(j = i; j < size+1; j++)
+                    {
+                        setCellColor("rootstable", i, j, "white");
+                    }
+                }
+                
+                runbutton.style.display="none";
+                showbutton.style.display="block";
+            }
+         
+            // A selection sort is performed on the arrays to make sure they are sorted for the algorithm to work.
+            function selectionSort()
+            {
+                var size = document.getElementById("numelements").value;
+                var min, temp;
+                
+                for(i = 0; i < size-1; i++)
+                {
+                    min = i;
+         
+                    for(j = i+1; j < size; j++)
+                    {
+                        if(arr_k[j] < arr_k[min])
+                        {
+                            min = j;
+                        }
+                    }
+                    
+                    temp = arr_k[i]; 
+                    arr_k[i] = arr_k[min];
+                    arr_k[min] = temp;
+                    
+                    temp = arr_p[i];
+                    arr_p[i] = arr_p[min];
+                    arr_p[min] = temp;    
+                }
+            
+                // Array is sorted at this point; this prints the sorted array.
+                createArrayTable(); 
+            }
+         
+			// Finalizes the values input by the user and calls the selection sort function.
+            function lockAndSortArray()
+            {
+                getArrayFromTable("table1","table2");
+                selectionSort();
+            }
+         
+			// Pulls the values from the tables and places them into an array.
+            function getArrayFromTable(table1_id, table2_id)
+            {
+                var size = document.getElementById("numelements").value;
+ 
+                for (var i = 0; i < size; i++) 
+                {
+                    arr_k[i] = getInputCellValue(table1_id, i, 0);
+                    arr_p[i] = getInputCellValue(table2_id, i, 0);
+                }
+         
+                donebutton.style.display="none";
+                startbutton.style.display="none";
+                runbutton.style.display="block";
+            }
+         
+            // Creates tables of user inputs from an array.
+            function createArray()
+            {
+                var size = document.getElementById("numelements").value;
+                var sum = 0
+                
+                donebutton.style.display="none";
+                numelements.style.display ="none";
+                startbutton.style.visibility="visible";
+                
+                for(var i = 0; i < size; i++)
+                {  
+                    arr_p[i] = 0; 
+                    
+                    while(arr_p[i] == 0)
+                    {
+                        arr_k[i] = getRandomInt(100)+1;
+                        arr_p[i] = Math.floor(Math.random()*100)/100;
+                    }
+                }    
+                
+                for(var i = 0; i < size; i++)
+                {
+                    sum += arr_p[i];
+                }
+                
+                if(sum > 1)
+                    while(sum > 1)
+                    {
+                        for(var i = 0; i < size; i++)
+                        {
+                            if(sum > 1)
+                            {
+                                if(arr_p[i] > 0.15)
+                                {
+                                    arr_p[i] -= 0.1;
+                                    sum-=0.1;
+                                }
+                            }
+                        }
+                    }   
+                
+                arr_p[size-1] += 1-sum;
+                
+                for(var i = 0; i < size; i++)
+                {
+                    arr_p[i] = Math.floor(arr_p[i]*100)/100;
+                }
+             
+                 createArrayTable();
+            }
+            
+            // Makes tables out of the arrays.
+            function createArrayTable()
+            {
+                var size = document.getElementById("numelements").value;
+                
+                createTable("table1", size, 1);
+                createTable("table2", size, 1);
+                
+                for(var i = 0; i < size; i++)
+                {
+                    setCellAsInputBox("table1", i, 0, arr_k[i]);
+                    setCellAsInputBox("table2", i, 0, arr_p[i]);
+                }
+            }
+ 
+			// Mr. Robot will say this when the page is loaded.
+			function welcome()
+			{
+				sayIt("An optimal binary search tree, or optimal BST, is a tree with the smallest possible search cost for a given list of sorted keys, each of which has a specific probability (or frequency) of being searched. Each subtree in the optimal BST is in itself an optimal BST, so by sorting individual nodes into subtrees, combining the subtrees, and then sorting the result of that combination, the final result is an all-inclusive optimal BST. Given a sorted array of tree node key values and their corresponding frequencies, create an optimal BST. To calculate which node will be the root between two values, compare the sums of their frequency products. That is, compare Frequency 1 plus 2 times Frequency 2 against Frequency 2 plus 2 times Frequency 1, and the larger frequency's corresponding key value will be the root. This ensures that the largest costs will be amplified the least.");
+			}
+ 
+        </script>
+ 
+		<!-- CSS styling to make the psuedocode buttons more reasonable. -->
+        <style>
+            h3 {
+                position: relative;
+                left: 300px;
+                top: 500px;
+            }
+        </style>
+		
+    </head>
+    
+    <!-- The voice message that plays when users enter the page; mutable. -->
+    <body onload="welcome()">
+	
+		<!-- The page header (displays the algorithm name). -->
+        <script>createHeader("Optimal Binary Search");</script>
+ 
+        <p>An <i>optimal binary search tree</i>, or optimal BST, is a tree with the smallest possible search cost for a given list of sorted keys, each of which has a specific probability (or "frequency") of being searched. 
+		   Each subtree in the optimal BST is in itself an optimal BST, so by sorting individual nodes into subtrees, combining the subtrees, and then sorting the result of that combination, the final result is an all-inclusive optimal BST.</p>
+		<p>Given a sorted array of tree node key values and their corresponding frequencies, create an optimal BST. To calculate which node will be the root between two values, compare the sums of their frequency products. 
+		   That is, compare (Freq1 + 2*Freq2) against (Freq2 + 2*Freq1), and the larger frequency value's corresponding key value will be the root. This ensures that the largest costs will be amplified the least.</p>
+        
+		<div id="inputprompt">
+			<p>Input the number of items in your array: </p>
+		</div>
+		
+        <select id="numelements">
+            <option selected="selected">2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+        </select>
+		
+        <p><Button id="donebutton" onclick="createArray(); sayIt('Modify the contents of the array as desired. Press Sort to perform a selection sort on the array when ready.'); 
+											document.getElementById('startbutton').style='display:block'; document.getElementById('modify').style='display:block'; 
+											document.getElementById('inputprompt').style='display:none';">Done</Button></p>
+        
+		<div id="modify" style="display:none">
+			<p>Modify the contents of the array as desired. Press "Sort" to perform a selection sort on the array when ready. </p>
+			<p><Button id="startbutton" style="display:none" onclick="lockAndSortArray(); sayIt('If you are satisfied with the values below, click Run Algorithm to perform an optimal binary search.'); document.getElementById('runit').style='display:block'; document.getElementById('modify').style='display:none'">Sort</Button></p>
+        </div>
+		
+		<div id="runit" style="display:none">
+			<p>If you are satisfied with the values below, click "Run Algorithm" to perform an optimal binary search. </p>
+			<p><button id="runbutton" style="display:none" onclick="sayIt('Follow along with the example step by step at the bottom of the page. If you would like to skip the steps and see the final result at any time, click Show Results.'); OptimalBST(); startPseudocode(); document.getElementById('runit').style='display:none'; document.getElementById('final').style='display:block'">Run Algorithm</button></p>
+		</div>
+		
+		<div id="final" style="display:none">
+			<p>Follow along with the example step by step at the bottom of the page. If you would like to skip the steps and see the final result at any time, click "Show Results". </p>
+			<p><button id="showbutton" style="display:none" onclick="showTables(); document.getElementById('runit').style='display:none'">Show Results</button></p>
+		</div>
+		
+        <h3>
+            <Button id= "ButtonShowMe" style="display:none" value="Show Me" onclick="showMe()"></Button>
+            <Button id= "ButtonYes" style="display:none" value="Yes" onclick="leftOption()"></Button>
+            <Button id= "ButtonNo" style="display:none" value="No" onclick="rightOption()"></Button>
+        </h3>
+		
+    </body>
+	
+</html>
+
+ 
+
+
+
+
+
+
+
